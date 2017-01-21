@@ -1,29 +1,201 @@
 package ara.mcgill.com.braille_ara;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.SeekBar;
 
 import net.mabboud.android_tone_player.ContinuousBuzzer;
 
+import java.util.logging.Logger;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnTextChanged;
+import butterknife.OnTouch;
+
 public class MainActivity extends AppCompatActivity {
+    @BindView(R.id.editText)
+    EditText et;
+    @BindView(R.id.editText1)
+    EditText et1;
+    @BindView(R.id.editText2)
+    EditText et2;
+    @BindView(R.id.editText3)
+    EditText et3;
+    @BindView(R.id.seekBar)
+    SeekBar sb;
+    @BindView(R.id.seekBar1)
+    SeekBar sb1;
+    @BindView(R.id.seekBar2)
+    SeekBar sb2;
+    @BindView(R.id.seekBar3)
+    SeekBar sb3;
+
+//    @BindString(R.string.login_error) String loginErrorMessage;
+
+    boolean volume_changing = false;
+
+    ContinuousBuzzer player = new ContinuousBuzzer();
+    ContinuousBuzzer player1 = new ContinuousBuzzer();
+    ContinuousBuzzer player2 = new ContinuousBuzzer();
+    ContinuousBuzzer player3 = new ContinuousBuzzer();
+
+    Thread worker = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            while (true) {
+//                if (volume_changing) continue;
+                try {
+                    Thread.currentThread().sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                player.play();
+                player1.play();
+                player2.play();
+                player3.play();
+            }
+        }
+    });
+
+    @OnTextChanged (R.id.editText)
+    void clickEt() {
+        if (et.getText().length() <= 0) return;
+        player.setToneFreqInHz(Integer.parseInt(et.getText().toString()));
+    }
+
+    @OnTextChanged (R.id.editText1)
+    void clickEt1() {
+        if (et1.getText().length() <= 0) return;
+        player1.setToneFreqInHz(Integer.parseInt(et1.getText().toString()));
+    }
+
+    @OnTextChanged (R.id.editText2)
+    void clickEt2() {
+        if (et2.getText().length() <= 0) return;
+        player2.setToneFreqInHz(Integer.parseInt(et2.getText().toString()));
+    }
+
+    @OnTextChanged (R.id.editText3)
+    void clickEt3() {
+        if (et3.getText().length() <= 0) return;
+        player3.setToneFreqInHz(Integer.parseInt(et3.getText().toString()));
+    }
+
+    void clicksb() {
+//        player.stop();
+        player.setVolume(sb.getProgress());
+        player.play();
+    }
+
+    void clicksb1() {
+//        player1.stop();
+        player1.setVolume(sb1.getProgress());
+        player1.play();
+    }
+
+    void clicksb2() {
+//        player2.stop();
+        player2.setVolume(sb2.getProgress());
+        player2.play();
+    }
+
+    void clicksb3() {
+//        player3.stop();
+        player3.setVolume(sb3.getProgress());
+        player3.play();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        ContinuousBuzzer ang = new ContinuousBuzzer();
-        ang.setPausePeriodSeconds(10);
-        ang.setPauseTimeInMs(1000);
-        ang.play();
+        sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                clicksb();
+            }
 
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                volume_changing = true;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                volume_changing = false;
+            }
+        });
+        sb1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                clicksb1();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                volume_changing = true;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                volume_changing = false;
+            }
+        });
+        sb2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                clicksb2();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                volume_changing = true;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                volume_changing = false;
+            }
+        });
+        sb3.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                clicksb3();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                volume_changing = true;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                volume_changing = false;
+            }
+        });
+        player.setPausePeriodSeconds(3);
+        player1.setPausePeriodSeconds(3);
+        player2.setPausePeriodSeconds(3);
+        player3.setPausePeriodSeconds(3);
+        player.setVolume(0);
+        player1.setVolume(0);
+        player2.setVolume(0);
+        player3.setVolume(0);
+        player.setToneFreqInHz(2000);
+        player1.setToneFreqInHz(500);
+        player2.setToneFreqInHz(1000);
+        player3.setToneFreqInHz(1500);
+        worker.start();
     }
 
     @Override
@@ -46,5 +218,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//        worker.stop();
     }
 }
