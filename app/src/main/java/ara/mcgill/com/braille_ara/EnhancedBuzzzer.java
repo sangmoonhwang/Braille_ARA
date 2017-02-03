@@ -114,8 +114,9 @@ public class EnhancedBuzzzer extends ContinuousBuzzer {
 
             // pause() appears to be more snappy in audio cutoff than stop()
             if (audioTrack != null) {
-                audioTrack.pause();
-                audioTrack.flush();
+//                audioTrack.pause();
+//                audioTrack.flush();
+                audioTrack.stop();
                 audioTrack.release();
             }
 //            audioTrack = null;

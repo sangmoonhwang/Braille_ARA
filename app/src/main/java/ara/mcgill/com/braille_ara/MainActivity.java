@@ -1,5 +1,6 @@
 package ara.mcgill.com.braille_ara;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -52,11 +53,11 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             while (true) {
                 if (paused) continue;
-                try {
-                    Thread.currentThread().sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    Thread.currentThread().sleep(10);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
                 player.play();
                 player1.play();
                 player2.play();
@@ -118,6 +119,163 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        ButterKnife.bind(this);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+//        sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+//                clicksb();
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//                volume_changing = true;
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//                volume_changing = false;
+//            }
+//        });
+//        sb1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+//                clicksb1();
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//                volume_changing = true;
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//                volume_changing = false;
+//            }
+//        });
+//        sb2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+//                clicksb2();
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//                volume_changing = true;
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//                volume_changing = false;
+//            }
+//        });
+//        sb3.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+//                clicksb3();
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//                volume_changing = true;
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//                volume_changing = false;
+//            }
+//        });
+//        player.setPausePeriodSeconds(1);
+//        player1.setPausePeriodSeconds(1);
+//        player2.setPausePeriodSeconds(1);
+//        player3.setPausePeriodSeconds(1);
+//        player.setToneFreqInHz(2000);
+//        player1.setToneFreqInHz(500);
+//        player2.setToneFreqInHz(1000);
+//        player3.setToneFreqInHz(1500);
+//        player.setVolume(0);
+//        player1.setVolume(0);
+//        player2.setVolume(0);
+//        player3.setVolume(0);
+////        player.play();
+////        player1.play();
+////        player2.play();
+////        player3.play();
+//        worker.start();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();  // Always call the superclass method first
+//        worker.suspend();
+        paused = true;
+        worker.interrupt();
+//        try {
+//            worker.join();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+        player.stop();
+        player1.stop();
+        player2.stop();
+        player3.stop();
+        finish();
+//        worker = null;
+//        try {
+//            worker.wait();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setContentView(R.layout.activity_main);
+        paused = false;
+//        worker = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while (true) {
+//                    if (paused) continue;
+//                    try {
+//                        Thread.currentThread().sleep(1);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    player.play();
+//                    player1.play();
+//                    player2.play();
+//                    player3.play();
+//                }
+//            }
+//        });
+
+//        if (worker.isInterrupted()) worker.run();
+
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -197,87 +355,33 @@ public class MainActivity extends AppCompatActivity {
         player1.setVolume(0);
         player2.setVolume(0);
         player3.setVolume(0);
+//        player.play();
+//        player1.play();
+//        player2.play();
+//        player3.play();
         worker.start();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();  // Always call the superclass method first
-//        worker.suspend();
-        paused = true;
-        worker.interrupt();
-        player.stop();
-        player1.stop();
-        player2.stop();
-        player3.stop();
-        finish();
-//        worker = null;
-//        try {
-//            worker.wait();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        paused = false;
-//        worker = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                while (true) {
-//                    if (paused) continue;
-//                    try {
-//                        Thread.currentThread().sleep(1);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    player.play();
-//                    player1.play();
-//                    player2.play();
-//                    player3.play();
-//                }
-//            }
-//        });
-
-        if (worker.isInterrupted()) worker.run();
-    }
-
+    @SuppressLint("NewApi")
     @Override
     protected void onStop() {
         // call the superclass method first
         super.onStop();
         paused = true;
         worker.interrupt();
+//        try {
+//            worker.join();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         worker = null;
         player.stop();
         player1.stop();
         player2.stop();
         player3.stop();
         finish();
+        System.exit(0);
+        this.finishAffinity();
 //        try {
 //            worker.wait();
 //        } catch (InterruptedException e) {
@@ -297,5 +401,11 @@ public class MainActivity extends AppCompatActivity {
         player2.stop();
         player3.stop();
 //        worker.stop();
+    }
+
+    @Override
+    public void onBackPressed() { //here I capture the event onBackPress
+        super.onBackPressed();
+        onStop(); //call onStop
     }
 }
