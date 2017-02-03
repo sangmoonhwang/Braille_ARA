@@ -40,19 +40,20 @@ public class MainActivity extends AppCompatActivity {
 //    @BindString(R.string.login_error) String loginErrorMessage;
 
     boolean volume_changing = false;
+    boolean paused = false;
 
-    ContinuousBuzzer player = new ContinuousBuzzer();
-    ContinuousBuzzer player1 = new ContinuousBuzzer();
-    ContinuousBuzzer player2 = new ContinuousBuzzer();
-    ContinuousBuzzer player3 = new ContinuousBuzzer();
+    volatile EnhancedBuzzzer player = new EnhancedBuzzzer();
+    volatile EnhancedBuzzzer player1 = new EnhancedBuzzzer();
+    volatile EnhancedBuzzzer player2 = new EnhancedBuzzzer();
+    volatile EnhancedBuzzzer player3 = new EnhancedBuzzzer();
 
     Thread worker = new Thread(new Runnable() {
         @Override
         public void run() {
             while (true) {
-//                if (volume_changing) continue;
+                if (paused) continue;
                 try {
-                    Thread.currentThread().sleep(1000);
+                    Thread.currentThread().sleep(1);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 player2.play();
                 player3.play();
             }
+
         }
     });
 
@@ -91,25 +93,25 @@ public class MainActivity extends AppCompatActivity {
     void clicksb() {
 //        player.stop();
         player.setVolume(sb.getProgress());
-        player.play();
+//        player.play();
     }
 
     void clicksb1() {
 //        player1.stop();
         player1.setVolume(sb1.getProgress());
-        player1.play();
+//        player1.play();
     }
 
     void clicksb2() {
 //        player2.stop();
         player2.setVolume(sb2.getProgress());
-        player2.play();
+//        player2.play();
     }
 
     void clicksb3() {
 //        player3.stop();
         player3.setVolume(sb3.getProgress());
-        player3.play();
+//        player3.play();
     }
 
     @Override
@@ -183,18 +185,18 @@ public class MainActivity extends AppCompatActivity {
                 volume_changing = false;
             }
         });
-        player.setPausePeriodSeconds(3);
-        player1.setPausePeriodSeconds(3);
-        player2.setPausePeriodSeconds(3);
-        player3.setPausePeriodSeconds(3);
-        player.setVolume(0);
-        player1.setVolume(0);
-        player2.setVolume(0);
-        player3.setVolume(0);
+        player.setPausePeriodSeconds(1);
+        player1.setPausePeriodSeconds(1);
+        player2.setPausePeriodSeconds(1);
+        player3.setPausePeriodSeconds(1);
         player.setToneFreqInHz(2000);
         player1.setToneFreqInHz(500);
         player2.setToneFreqInHz(1000);
         player3.setToneFreqInHz(1500);
+        player.setVolume(0);
+        player1.setVolume(0);
+        player2.setVolume(0);
+        player3.setVolume(0);
         worker.start();
     }
 
@@ -221,8 +223,79 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();  // Always call the superclass method first
+//        worker.suspend();
+        paused = true;
+        worker.interrupt();
+        player.stop();
+        player1.stop();
+        player2.stop();
+        player3.stop();
+        finish();
+//        worker = null;
+//        try {
+//            worker.wait();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        paused = false;
+//        worker = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while (true) {
+//                    if (paused) continue;
+//                    try {
+//                        Thread.currentThread().sleep(1);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    player.play();
+//                    player1.play();
+//                    player2.play();
+//                    player3.play();
+//                }
+//            }
+//        });
+
+        if (worker.isInterrupted()) worker.run();
+    }
+
+    @Override
+    protected void onStop() {
+        // call the superclass method first
+        super.onStop();
+        paused = true;
+        worker.interrupt();
+        worker = null;
+        player.stop();
+        player1.stop();
+        player2.stop();
+        player3.stop();
+        finish();
+//        try {
+//            worker.wait();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        worker.stop();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+        paused = false;
+        if (worker != null) worker.interrupt();
+        worker = null;
+        player.stop();
+        player1.stop();
+        player2.stop();
+        player3.stop();
 //        worker.stop();
     }
 }
