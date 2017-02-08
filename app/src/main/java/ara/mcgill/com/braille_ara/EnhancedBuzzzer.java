@@ -30,7 +30,9 @@ public class EnhancedBuzzzer extends ContinuousBuzzer {
     public void setVolume(int volume) {
         super.setVolume(volume);
         float gain = (float) (volume / 100.0);
-//        audioTrack.setStereoVolume(gain, gain);
+        if (audioTrack == null) return;
+        audioTrack.setStereoVolume(gain, gain);
+//        audioTrack.play();
     }
 
     @Override
@@ -89,7 +91,7 @@ public class EnhancedBuzzzer extends ContinuousBuzzer {
     protected void asyncPlayTrack(final double toneFreqInHz) {
         playerWorker = new Thread(new Runnable() {
             public void run() {
-                while (isPlaying) {
+                while (isPlaying || true) {
                     // will pause every x seconds useful for determining when a certain amount
                     // of time has passed while whatever the buzzer is signaling is active
                     playTone(toneFreqInHz, pausePeriodSeconds);
@@ -104,6 +106,7 @@ public class EnhancedBuzzzer extends ContinuousBuzzer {
 
         playerWorker.start();
     }
+
     @Override
     protected void tryStopPlayer() {
 //        super.tryStopPlayer();
@@ -114,10 +117,14 @@ public class EnhancedBuzzzer extends ContinuousBuzzer {
 
             // pause() appears to be more snappy in audio cutoff than stop()
             if (audioTrack != null) {
-//                audioTrack.pause();
-//                audioTrack.flush();
-                audioTrack.stop();
-                audioTrack.release();
+                try {
+//                    audioTrack.pause();
+//                    audioTrack.flush();
+                    audioTrack.release();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    ;
+                }
             }
 //            audioTrack = null;
         } catch (IllegalStateException e) {
@@ -178,14 +185,14 @@ public class EnhancedBuzzzer extends ContinuousBuzzer {
         }
 
         // Ramp amplitude down
-//        for (i = i; i < numSamples; ++i) {
-//            double dVal = sample[i];
-//            // Ramp down to zero
-//            final short val = (short) ((dVal * 32767 * (numSamples - i) / ramp));
-//            // in 16 bit wav PCM, first byte is the low order byte
-//            soundData[idx++] = (byte) (val & 0x00ff);
-//            soundData[idx++] = (byte) ((val & 0xff00) >>> 8);
-//        }
+        for (i = i; i < numSamples; ++i) {
+            double dVal = sample[i];
+            // Ramp down to zero
+            final short val = (short) ((dVal * 32767 * (numSamples - i) / ramp));
+            // in 16 bit wav PCM, first byte is the low order byte
+            soundData[idx++] = (byte) (val & 0x00ff);
+            soundData[idx++] = (byte) ((val & 0xff00) >>> 8);
+        }
 
         playSound(sampleRate, soundData);
     }
@@ -201,8 +208,11 @@ public class EnhancedBuzzzer extends ContinuousBuzzer {
 
             float gain = (float) (volume / 100.0);
             //noinspection deprecation
+//            audioTrack.reloadStaticData();
             audioTrack.setStereoVolume(gain, gain);
 //            audioTrack.setLoopPoints(0,soundData.length,-1);
+//            audioTrack.setPlaybackHeadPosition(100);
+//            audioTrack.write(soundData, 0, soundData.length);
             audioTrack.play();
             audioTrack.write(soundData, 0, soundData.length);
         } catch (Exception e) {
@@ -213,5 +223,6 @@ public class EnhancedBuzzzer extends ContinuousBuzzer {
                 tryStopPlayer();
         } catch (Exception ex) {
             //
-        }    }
+        }
+    }
 }
