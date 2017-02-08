@@ -134,7 +134,60 @@ public class EnhancedBuzzzer extends ContinuousBuzzer {
      */
     @Override
     protected void playTone(double freqInHz, double seconds) {
-        super.playTone(freqInHz, seconds);
+        int sampleRate = 8000;
+
+        double dnumSamples = seconds * sampleRate;
+        dnumSamples = Math.ceil(dnumSamples);
+        int numSamples = (int) dnumSamples;
+        double sample[] = new double[numSamples];
+        byte soundData[] = new byte[2 * numSamples];
+
+        // Fill the sample array
+        for (int i = 0; i < numSamples; ++i)
+            sample[i] = Math.sin(freqInHz * 2 * Math.PI * i / (sampleRate));
+
+        // convert to 16 bit pcm sound array
+        // assumes the sample buffer is normalized.
+        // convert to 16 bit pcm sound array
+        // assumes the sample buffer is normalised.
+        int idx = 0;
+        int i = 0;
+
+        // Amplitude ramp as a percent of sample count
+        int ramp = numSamples / 20;
+
+        // Ramp amplitude up (to avoid clicks)
+        for (i = 0; i < ramp; ++i) {
+            double dVal = sample[i];
+            // Ramp up to maximum
+            final short val = (short) ((dVal * 32767 * i / ramp));
+            // in 16 bit wav PCM, first byte is the low order byte
+            soundData[idx++] = (byte) (val & 0x00ff);
+            soundData[idx++] = (byte) ((val & 0xff00) >>> 8);
+        }
+
+
+        // Max amplitude for most of the samples
+        for (i = i; i < numSamples - ramp; ++i) {
+            double dVal = sample[i];
+            // scale to maximum amplitude
+            final short val = (short) ((dVal * 32767));
+            // in 16 bit wav PCM, first byte is the low order byte
+            soundData[idx++] = (byte) (val & 0x00ff);
+            soundData[idx++] = (byte) ((val & 0xff00) >>> 8);
+        }
+
+        // Ramp amplitude down
+//        for (i = i; i < numSamples; ++i) {
+//            double dVal = sample[i];
+//            // Ramp down to zero
+//            final short val = (short) ((dVal * 32767 * (numSamples - i) / ramp));
+//            // in 16 bit wav PCM, first byte is the low order byte
+//            soundData[idx++] = (byte) (val & 0x00ff);
+//            soundData[idx++] = (byte) ((val & 0xff00) >>> 8);
+//        }
+
+        playSound(sampleRate, soundData);
     }
 
     @Override
@@ -149,7 +202,7 @@ public class EnhancedBuzzzer extends ContinuousBuzzer {
             float gain = (float) (volume / 100.0);
             //noinspection deprecation
             audioTrack.setStereoVolume(gain, gain);
-            audioTrack.setLoopPoints(0,soundData.length,-1);
+//            audioTrack.setLoopPoints(0,soundData.length,-1);
             audioTrack.play();
             audioTrack.write(soundData, 0, soundData.length);
         } catch (Exception e) {

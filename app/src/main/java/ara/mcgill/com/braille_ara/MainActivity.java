@@ -53,15 +53,15 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             while (true) {
                 if (paused) continue;
-//                try {
-//                    Thread.currentThread().sleep(10);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
                 player.play();
                 player1.play();
                 player2.play();
                 player3.play();
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    return;
+                }
             }
 
         }
