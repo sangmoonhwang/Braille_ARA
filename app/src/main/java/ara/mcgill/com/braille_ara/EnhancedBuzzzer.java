@@ -155,8 +155,6 @@ public class EnhancedBuzzzer extends ContinuousBuzzer {
 
         // convert to 16 bit pcm sound array
         // assumes the sample buffer is normalized.
-        // convert to 16 bit pcm sound array
-        // assumes the sample buffer is normalised.
         int idx = 0;
         int i = 0;
 
